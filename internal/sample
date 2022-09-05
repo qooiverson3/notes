@@ -1,0 +1,40 @@
+package version
+
+import (
+	"fmt"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
+
+// Version info
+// overwrite by ldflags
+var (
+	Version   string = "unknown"
+	BuildTime string = "unknown"
+	Commit    string = "unknown"
+)
+
+// Print write version info to standard output
+func Print() {
+	fmt.Printf(
+		"  Version: %s\n  BuildTime: %s\n  Commit: %s\n",
+		Version,
+		BuildTime,
+		Commit,
+	)
+}
+
+// Maps of version info
+func Maps() map[string]string {
+	return map[string]string{
+		"version":   Version,
+		"buildtime": BuildTime,
+		"commit":    Commit,
+	}
+}
+
+// InfoHandler 取得系統當前版本資訊
+func InfoHandler(c *gin.Context) {
+	c.JSON(http.StatusOK, Maps())
+}
