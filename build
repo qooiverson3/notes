@@ -1,0 +1,31 @@
+# git
+version := $(shell git describe --tags --dirty --match 'v*' || echo 'dev')
+commit := $(shell git rev-parse --short HEAD || echo '?')
+buildtime := $(shell date +%Y-%m-%dT%H:%M:%S%z)
+
+build_flag := "-w \
+	-X xxx.com/ces-k8s/popeye/internal/version.Version=$(version) \
+	-X xxx.com/ces-k8s/popeye/internal/version.BuildTime=$(buildtime) \
+	-X xxx.com/ces-k8s/popeye/internal/version.Commit=$(commit)"
+
+all: build
+
+lint:
+	golint -set_exit_status ./...
+
+test:
+	go test ./... -count=1
+
+coverage:
+	go test ./... -coverprofile=coverage.out
+	go tool cover -func=coverage.out
+	rm coverage.out
+
+build: ./*
+	GOOS=linux GOARCH=amd64 go build -o build/popeye -a -v -ldflags $(build_flag) ./cmd/main.go
+
+tar:
+	tar zcvf popeye.tar.gz build
+
+clean:
+	rm -r build
