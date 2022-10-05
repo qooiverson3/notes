@@ -1,0 +1,13 @@
+func TestCreate(t *testing.T) {
+	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
+	defer mt.Close()
+
+	mt.Run("test123", func(mt *mtest.T) {
+		mt.AddMockResponses(mtest.CreateSuccessResponse())
+
+		r, err := lab.Create(mt.Client)
+		str := r.InsertedID.(primitive.ObjectID).Hex()
+		assert.NotEmpty(t, str)
+		assert.ErrorIs(t, err, nil)
+	})
+}
